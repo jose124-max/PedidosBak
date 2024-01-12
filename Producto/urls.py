@@ -18,6 +18,6 @@ urlpatterns = [
     path('categoriaExist/', CategoriaExist.as_view(), name='CategoriaExist'),
     path('listar_categorias/', ListaCategorias.as_view(), name='ListaCategorias'),    
     path('crearcomponente/', CrearComponente.as_view(), name='crearcomponente'),
-    path('listarcomponentes/', ListarComponentes.as_view(), name='listar_componentes'),
+    path('listarcomponentes/', ListarComponentes.as_view(), name='listar_componentesc'),
     path('editarcomponente/<int:id_componente>/', EditarComponente.as_view(), name='editar_componente')
 ]
