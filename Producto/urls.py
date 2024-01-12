@@ -16,6 +16,8 @@ urlpatterns = [
     path('listarproductos/', ListaTiposProductos.as_view(), name='ListaTiposProductos'),
     path('tipoProductoExist/', tipoProductoExist.as_view(), name='tipoProductoExist'),
     path('categoriaExist/', CategoriaExist.as_view(), name='CategoriaExist'),
-    path('listar_categorias/', ListaCategorias.as_view(), name='ListaCategorias')
-
+    path('listar_categorias/', ListaCategorias.as_view(), name='ListaCategorias'),    
+    path('crearcomponente/', CrearComponente.as_view(), name='crearcomponente'),
+    path('listarcomponentes/', ListarComponentes.as_view(), name='listar_componentes'),
+    path('editarcomponente/<int:id_componente>/', EditarComponente.as_view(), name='editar_componente')
 ]
