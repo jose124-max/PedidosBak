@@ -383,6 +383,100 @@ class EditarProducto(View):
             return JsonResponse({'mensaje': 'Producto editado con éxito'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CrearComponente(View):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+
+            nombre = data.get('nombre')
+            descripcion = data.get('descripcion')
+            costo = data.get('costo')
+            tipo = data.get('tipo')
+            id_um = data.get('id_um')
+
+            unidad_medida = UnidadMedida.objects.get(idum=id_um)
+
+            componente = Componente.objects.create(
+                nombre=nombre,
+                descripcion=descripcion,
+                costo=costo,
+                tipo=tipo,
+                id_um=unidad_medida
+            )
+
+            return JsonResponse({'mensaje': 'Componente creado con éxito', 'id_componente': componente.id_componente})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+class ListarComponentes(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            # Obtener todos los componentes
+            componentes = Componente.objects.all()
+
+            # Convertir los componentes a formato JSON
+            lista_componentes = []
+            for componente in componentes:
+                componente_data = {
+                    'id_componente': componente.id_componente,
+                    'nombre': componente.nombre,
+                    'descripcion': componente.descripcion,
+                    'costo': str(componente.costo),
+                    'tipo': componente.tipo,
+                    'id_um': componente.id_um.idum,
+                    'nombre_um': componente.id_um.nombreum,
+                }
+
+                lista_componentes.append(componente_data)
+
+            # Devolver la lista de componentes en formato JSON
+            return JsonResponse({'componentes': lista_componentes})
+        except Exception as e:
+            # Manejar errores aquí
+            return JsonResponse({'error': str(e)}, status=500)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EditarComponente(View):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        try:
+            # Obtener el ID del componente a editar de los argumentos de la URL
+            id_componente = kwargs.get('id_componente')
+
+            # Obtener el componente a editar
+            componente = Componente.objects.get(id_componente=id_componente)
+
+            # Obtener datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+
+            # Actualizar los datos del componente
+            componente.nombre = data.get('nombre', componente.nombre)
+            componente.descripcion = data.get('descripcion', componente.descripcion)
+            componente.costo = data.get('costo', componente.costo)
+            componente.tipo = data.get('tipo', componente.tipo)
+
+            # Verificar que la unidad de medida exista
+            id_um = data.get('id_um')
+            unidad_medida = UnidadMedida.objects.get(idum=id_um)
+            componente.id_um = unidad_medida
+
+            # Guardar los cambios
+            componente.save()
+
+            return JsonResponse({'mensaje': 'Componente editado con éxito', 'id_componente': componente.id_componente})
+        except Componente.DoesNotExist:
+            return JsonResponse({'error': 'Componente no encontrado'}, status=404)
+        except UnidadMedida.DoesNotExist:
+            return JsonResponse({'error': 'Unidad de medida no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+
 class ListarProductos(View):
     def get(self, request, *args, **kwargs):
         try:
