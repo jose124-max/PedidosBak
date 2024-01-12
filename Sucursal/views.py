@@ -16,7 +16,7 @@ from Login.models import Cuenta
 from io import BytesIO
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 class SucursalesListView(View):
     def get(self, request, *args, **kwargs):

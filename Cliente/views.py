@@ -10,12 +10,10 @@ class ActualizarClienteView(View):
     @login_required
     def post(self, request, *args, **kwargs):
         try:
-            user = request.user  # Obtener el usuario autenticado
+            user = request.user
 
-            # Obtener los datos del cuerpo de la solicitud
             data = json.loads(request.body)
             
-            # Actualizar los campos en el modelo Clientes asociado al usuario
             user.clientes.crazon_social = data.get('crazon_social', user.clientes.crazon_social)
             user.clientes.snombre = data.get('snombre', user.clientes.snombre)
             user.clientes.capellido = data.get('capellido', user.clientes.capellido)
@@ -23,7 +21,6 @@ class ActualizarClienteView(View):
             user.clientes.ccorreo_electronico = data.get('ccorreo_electronico', user.clientes.ccorreo_electronico)
             user.clientes.ubicacion = data.get('ubicacion', user.clientes.ubicacion)
             
-            # Guardar los cambios
             user.clientes.save()
 
             return JsonResponse({'mensaje': 'Datos del cliente actualizados correctamente'})

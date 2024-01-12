@@ -87,7 +87,7 @@ class EditarCategoriaCombo(View):
             categoria_combo_id = kwargs.get('categoria_combo_id')
             categoria_combo = CategoriasCombos.objects.get(id_catcombo=categoria_combo_id)
             
-            catnombre = request.POST.get('catnombre', categoria_combo.catnombre)  # Si no se proporciona, se mantiene el valor existente
+            catnombre = request.POST.get('catnombre', categoria_combo.catnombre)
             descripcion = request.POST.get('descripcion')
             imagencategoria = request.FILES.get('imagencategoria')
 
@@ -179,16 +179,13 @@ class CrearCombo(View):
             )
             combo.save()
 
-            # Procesa los detalles del combo
             detalle_combo_data = json.loads(request.POST.get('detalle_combo', '[]'))
             
-            # Procesa los detalles del combo
             for detalle_data in detalle_combo_data:
                 id_producto = detalle_data.get('id_producto')
                 cantidad = detalle_data.get('cantidad')
                 producto = Producto.objects.get(id_producto=id_producto)
 
-                # Crea y guarda el detalle del combo
                 DetalleCombo.objects.create(
                     id_combo=combo,
                     id_producto=producto,
@@ -213,7 +210,7 @@ class EditarCombo(View):
             if cuenta.rol != 'S':
                 return JsonResponse({'error': 'No tienes permisos para editar un combo'}, status=403)
 
-            combo_id = kwargs.get('combo_id')  # Asegúrate de tener la URL configurada para recibir el ID del combo
+            combo_id = kwargs.get('combo_id')
             combo = Combo.objects.get(id_combo=combo_id)
             combo.id_catcombo = CategoriasCombos.objects.get(id_catcombo=request.POST.get('id_catcombo', combo.id_catcombo.id_catcombo))
             combo.imagenc = request.POST.get('imagenc', combo.imagenc)

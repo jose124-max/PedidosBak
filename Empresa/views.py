@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.db import transaction
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import base64
 from io import BytesIO
 import json
@@ -43,7 +43,6 @@ class EmpresaDatosView(View):
 
                 }
 
-                # Devuelve la información como respuesta JSON
                 return JsonResponse({'mensaje': 'Datos de la empresa', 'empresa_info': empresa_info})
             else:
                 return JsonResponse({'mensaje': 'No hay registros en la tabla Empresa'}, status=404)

@@ -64,13 +64,11 @@ class EditarBodegaView(View):
             descripcion = data.get('descripcion')
             id_sucursal = data.get('id_sucursal')
 
-            # Reemplaza 'id' con el nombre correcto del campo de identificación en tu modelo Bodegas
             bodega = Bodegas.objects.get(id_bodega=bodega_id)
 
             bodega.nombrebog = nombrebog
             bodega.descripcion = descripcion
 
-            # Obtener la sucursal correspondiente
             sucursal = Sucursales.objects.get(id_sucursal=id_sucursal)
             bodega.id_sucursal = sucursal
 
