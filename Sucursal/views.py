@@ -15,6 +15,7 @@ from django.db import transaction
 from Login.models import Cuenta
 from io import BytesIO
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from Empleados.models import *
 
 from PIL import Image
 
@@ -64,6 +65,7 @@ class SucursalesListView(View):
                     'firmaelectronica': sucursal.firmaelectronica,
                     'id_empresa': sucursal.id_empresa_id,
                     'id_ubicacion': ubicacion_info,
+                    'cantidadempleados':cantidaEmp(sucursal.id_sucursal),
                     'imagensucursal': imagen_base64_resized,
                 }
                 serialized_sucursales.append(sucursal_info)
@@ -72,6 +74,18 @@ class SucursalesListView(View):
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+def cantidaEmp(ids):
+        if ids:
+            jefes_cocina = JefeCocina.objects.filter(id_sucursal=ids).count()
+            motorizados = Motorizado.objects.filter(id_sucursal=ids).count()
+            administradores = Administrador.objects.filter(id_sucursal=ids).count()
+            meseros = Mesero.objects.filter(id_sucursal=ids).count()
+        else:
+            jefes_cocina = JefeCocina.objects.all().count()
+            motorizados = Motorizado.objects.all().count()
+            administradores = Administrador.objects.all().count()
+            meseros = Mesero.objects.all().count()
+        return jefes_cocina + motorizados + administradores + meseros
 @method_decorator(csrf_exempt, name='dispatch')
 class Crearsucursal(View):
     #@method_decorator(login_required)
@@ -155,7 +169,7 @@ class Editarubicacion(View):
             sucursaledit = Sucursales.objects.get(id_sucursal=id_sucursal)
             latitudx = request.POST.get('latitud')
             longitudx = request.POST.get('longitud')
-            sucursaledit.id_ubicacion = Ubicaciones.objects.create(latitud=latitudx, longitud=longitudx) if latitudx is not None and longitudx is not None else None
+            sucursaledit.id_ubicacion = Ubicaciones.objects.create(latitud=latitudx, longitud=longitudx,sestado=1) if latitudx is not None and longitudx is not None else None
             sucursaledit.save()
             return JsonResponse({'mensaje': 'Sucursal editada con éxito'})
         except Sucursales.DoesNotExist:
@@ -241,6 +255,7 @@ class cargarSucursal(View):
                 'firmaelectronica': sucursal.firmaelectronica,
                 'id_empresa': sucursal.id_empresa_id,
                 'id_ubicacion': ubicacion_info,
+                'cantidadempleados':cantidaEmp(sucursal.id_sucursal),
                 'imagensucursal': imagen_base64_resized,
             }
             serialized_sucursales.append(sucursal_info)

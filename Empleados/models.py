@@ -11,6 +11,7 @@ class JefeCocina(models.Model):
     telefono = models.CharField(max_length=10, blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     id_cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE,db_column='id_cuenta')
+    sestado = models.CharField(max_length=1)
     class Meta:
         managed = False
         db_table = 'jefecocina'
@@ -23,6 +24,7 @@ class Mesero(models.Model):
     nombre = models.CharField(max_length=300)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     id_cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE,db_column='id_cuenta')
+    sestado = models.CharField(max_length=1)
     class Meta:
         managed = False
         db_table = 'meseros'
@@ -35,6 +37,7 @@ class Motorizado(models.Model):
     telefono = models.CharField(max_length=10, blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     id_cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE,db_column='id_cuenta')
+    sestado = models.CharField(max_length=1)
     class Meta:
         managed = False
         db_table = 'motorizados'

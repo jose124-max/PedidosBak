@@ -15,11 +15,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator,EmptyPage
-
-
-
+from horariossemanales.models import Horariossemanales
 import json
 from django.db.models import Max, F
+from django.core.serializers import serialize
+from decimal import Decimal
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearTipoProducto(View):
@@ -34,7 +34,7 @@ class CrearTipoProducto(View):
             tp_nombre = data.get('tp_nombre')
             descripcion = data.get('descripcion')
 
-            tipo_producto = TiposProductos.objects.create(tpnombre=tp_nombre, descripcion=descripcion)
+            tipo_producto = TiposProductos.objects.create(tpnombre=tp_nombre, descripcion=descripcion,sestado=1)
             tipo_producto.save()
 
             return JsonResponse({'mensaje': 'Tipo de producto creado con éxito'})
@@ -97,7 +97,8 @@ class CrearCategoria(View):
                 id_tipoproducto=tipo_producto,
                 catnombre=cat_nombre,
                 descripcion=descripcion,
-                imagencategoria=image_64_encode
+                imagencategoria=image_64_encode,
+                sestado=1
             )
             categoria.save()
 
@@ -108,7 +109,7 @@ class CrearCategoria(View):
 class ListaTiposYCategorias(View):
     def get(self, request, *args, **kwargs):
         try:
-            tipos_productos = TiposProductos.objects.all()
+            tipos_productos = TiposProductos.objects.filter(sestado=1)
             data = []
 
             for tipo_producto in tipos_productos:
@@ -135,6 +136,7 @@ class ListaTiposYCategorias(View):
                     'id_tipoproducto': tipo_producto.id_tipoproducto,
                     'tpnombre': tipo_producto.tpnombre,
                     'descripcion': tipo_producto.descripcion,
+                    'sestado':tipo_producto.sestado,
                     'categorias': categorias_data
                 }
 
@@ -151,7 +153,7 @@ class ListaTiposYCategorias(View):
 class ListaTiposProductos(View):
     def get(self, request, *args, **kwargs):
         try:
-            tipos_productos = TiposProductos.objects.all()
+            tipos_productos = TiposProductos.objects.filter(sestado=1)
             data = []
             for tipo_producto in tipos_productos:
                 tipo_producto_data = {
@@ -169,7 +171,7 @@ class ListaTiposProductos(View):
 class ListaCategorias(View):
     def get(self, request, *args, **kwargs):
         try:
-            categorias = Categorias.objects.all()
+            categorias = Categorias.objects.filter(sestado=1)
             data = []
 
             for categoria in categorias:
@@ -183,11 +185,16 @@ class ListaCategorias(View):
                     except Exception as img_error:
                         print(f"Error al procesar imagen: {str(img_error)}")
 
+                tipo_producto_data = {
+                    'id_tipoproducto': categoria.id_tipoproducto.id_tipoproducto,
+                }
+
                 categoria_data = {
                     'id_categoria': categoria.id_categoria,
                     'imagencategoria': imagencategoria_base64,
                     'catnombre': categoria.catnombre,
-                    'descripcion': categoria.descripcion
+                    'descripcion': categoria.descripcion,
+                    'id_tipoproducto': tipo_producto_data
                 }
 
                 data.append(categoria_data)
@@ -208,6 +215,8 @@ class EditarTipoProducto(View):
             tipo_producto = TiposProductos.objects.get(id_tipoproducto=tipo_producto_id)
             tipo_producto.tpnombre = request.POST.get('tpnombre', tipo_producto.tpnombre)
             tipo_producto.descripcion = request.POST.get('descripcion', tipo_producto.descripcion)
+            if(request.POST.get('sestado')):
+                tipo_producto.sestado = request.POST.get('sestado')
             tipo_producto.save()
 
             return JsonResponse({'mensaje': 'Tipo de producto editado con éxito'})
@@ -225,9 +234,18 @@ class EditarCategoria(View):
             categoria_id = kwargs.get('categoria_id')  # Asegúrate de tener la URL configurada para recibir el ID de la categoría
             categoria = Categorias.objects.get(id_categoria=categoria_id)
             imagencategoria = request.FILES.get('imagencategoria')
-            categoria.catnombre = request.POST.get('catnombre')
-            categoria.descripcion = request.POST.get('descripcion')
-            categoria.id_tipoproducto = TiposProductos.objects.get(id_tipoproducto=request.POST.get('id_tipoproducto', categoria.id_tipoproducto.id_tipoproducto))
+            nombre= request.POST.get('catnombre')
+            if(nombre):
+                categoria.catnombre =nombre
+            descripcion = request.POST.get('descripcion')
+            if(descripcion):
+                categoria.descripcion=descripcion
+            estado= request.POST.get('sestado')
+            if(estado):
+                categoria.sestado =estado
+            tipo= request.POST.get('id_tipoproducto', categoria.id_tipoproducto.id_tipoproducto)
+            if tipo:
+                categoria.id_tipoproducto=TiposProductos.objects.get(id_tipoproducto=tipo)
             if imagencategoria:
                 try:
                     image_read = imagencategoria.read()
@@ -252,7 +270,7 @@ class CrearUnidadMedida(View):
             #    return JsonResponse({'error': 'No tienes permisos para crear una unidad de medida'}, status=403)
             data = json.loads(request.body)
             nombre_um = data.get('nombre_um')
-            unidad_medida = UnidadMedida.objects.create(nombreum=nombre_um)
+            unidad_medida = UnidadMedida.objects.create(nombreum=nombre_um,sestado=1)
             unidad_medida.save()
             return JsonResponse({'mensaje': 'Unidad de medida creada con éxito'})
         except Exception as e:
@@ -263,7 +281,7 @@ class CrearUnidadMedida(View):
 class ListarUnidadesMedida(View):
     def get(self, request, *args, **kwargs):
         try:
-            unidades_medida = UnidadMedida.objects.all()
+            unidades_medida = UnidadMedida.objects.filter(sestado=1)
             data = []
 
             for unidad in unidades_medida:
@@ -322,7 +340,8 @@ class CrearProducto(View):
                 preciounitario=preciounitario,
                 iva=iva,
                 ice=ice,
-                irbpnr=irbpnr
+                irbpnr=irbpnr,
+                sestado = 1
             )
             producto.save()
 
@@ -342,6 +361,7 @@ class EditarUnidadMedida(View):
             unidad = UnidadMedida.objects.get(idum=unidad_id)
 
             unidad.nombreum = request.POST.get('nombreum', unidad.nombreum)
+            unidad.sestado = request.POST.get('sestado', unidad.sestado)
             unidad.save()
 
             return JsonResponse({'mensaje': 'Unidad de medida editada con éxito'})
@@ -355,7 +375,6 @@ class EditarProducto(View):
         try:
             producto_id = kwargs.get('producto_id')
             producto = Producto.objects.get(id_producto=producto_id)
-
             producto.id_categoria = Categorias.objects.get(id_categoria=request.POST.get('id_categoria', producto.id_categoria.id_categoria))
             producto.id_um = UnidadMedida.objects.get(idum=request.POST.get('id_um', producto.id_um.idum))
             producto.puntosp = request.POST.get('puntosp', producto.puntosp)
@@ -383,6 +402,139 @@ class EditarProducto(View):
             return JsonResponse({'mensaje': 'Producto editado con éxito'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
+        
+@method_decorator(csrf_exempt, name='dispatch')
+class CrearComponente(View):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        try:
+            nombre = request.POST.get('nombre')
+            descripcion = request.POST.get('descripcion')
+            costo = request.POST.get('costo')
+            tipo = request.POST.get('tipo')
+            id_um = request.POST.get('id_um')
+            id_categoria = request.POST.get('id_categoria')
+            cantidadpadre = Decimal(request.POST.get('cantidad', 0))
+
+            # Verificar que la unidad de medida exista
+            unidad_medida = UnidadMedida.objects.get(idum=id_um)
+            categoria = Categorias.objects.get(id_categoria=id_categoria)
+
+            if tipo == 'N':
+                componente = Componente.objects.create(
+                    nombre=nombre,
+                    descripcion=descripcion,
+                    costo=costo,
+                    tipo=tipo,
+                    id_um=unidad_medida,
+                    id_categoria=categoria,
+                    sestado=1
+                )
+
+            if tipo == 'F' and cantidadpadre > 0:
+                detalle_comp = json.loads(request.POST.get('detalle_comp', '[]'))
+                componente = Componente.objects.create(
+                    nombre=nombre,
+                    descripcion=descripcion,
+                    costo=costo,
+                    tipo=tipo,
+                    id_um=unidad_medida,
+                    id_categoria=categoria,
+                    sestado=1
+                )
+                ensamblecomponente = EnsambleComponente.objects.create(
+                    id_componentepadre=componente,
+                    padrecantidad=cantidadpadre,
+                    id_umpadre=unidad_medida  # Ajusta esta línea según tu lógica
+                )
+                for detalle_data in detalle_comp:
+                    componente_hijo = Componente.objects.get(id_componente=detalle_data['id'])
+                    um = componente_hijo.id_um
+                    detalleensamblecomponente = DetalleEnsambleComponente.objects.create(
+                        id_ensamblec=ensamblecomponente,
+                        id_componentehijo=componente_hijo,
+                        cantidadhijo=detalle_data['cantidad'],
+                        id_umhijo=um
+                    )
+
+            return JsonResponse({'mensaje': 'Componente creado con éxito'})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+class ListarComponentes(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            # Obtener todos los componentes
+            componentes = Componente.objects.all()
+
+            # Convertir los componentes a formato JSON
+            lista_componentes = []
+            
+
+            for componente in componentes:
+                tipo_producto_data = {
+                    'id_categoria': componente.id_categoria.id_categoria,
+                    'catnombre': componente.id_categoria.catnombre,
+                }
+                componente_data = {
+                    'id_componente': componente.id_componente,
+                    'nombre': componente.nombre,
+                    'descripcion': componente.descripcion,
+                    'costo': '$'+str(componente.costo).replace('€', ''),
+                    'tipo': componente.tipo,
+                    'id_um': componente.id_um.idum,
+                    'id_categoria': tipo_producto_data,
+                    'nombre_um': componente.id_um.nombreum,
+                }
+
+                lista_componentes.append(componente_data)
+
+            # Devolver la lista de componentes en formato JSON
+            return JsonResponse({'componentes': lista_componentes})
+        except Exception as e:
+            # Manejar errores aquí
+            return JsonResponse({'error': str(e)}, status=500)
+        
+
+@method_decorator(csrf_exempt, name='dispatch')
+class EditarComponente(View):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        try:
+            # Obtener el ID del componente a editar de los argumentos de la URL
+            id_componente = kwargs.get('id_componente')
+
+            # Obtener el componente a editar
+            componente = Componente.objects.get(id_componente=id_componente)
+
+            # Obtener datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+
+            # Actualizar los datos del componente
+            componente.nombre = data.get('nombre', componente.nombre)
+            componente.descripcion = data.get('descripcion', componente.descripcion)
+            componente.costo = data.get('costo', componente.costo)
+            componente.tipo = data.get('tipo', componente.tipo)
+
+            # Verificar que la unidad de medida exista
+            id_um = data.get('id_um')
+            unidad_medida = UnidadMedida.objects.get(idum=id_um)
+            componente.id_um = unidad_medida
+
+            # Guardar los cambios
+            componente.save()
+
+            return JsonResponse({'mensaje': 'Componente editado con éxito', 'id_componente': componente.id_componente})
+        except Componente.DoesNotExist:
+            return JsonResponse({'error': 'Componente no encontrado'}, status=404)
+        except UnidadMedida.DoesNotExist:
+            return JsonResponse({'error': 'Unidad de medida no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+
+
 class ListarProductos(View):
     def get(self, request, *args, **kwargs):
         try:
@@ -406,21 +558,27 @@ class ListarProductos(View):
 
             # Convertir productos a formato JSON
             lista_productos = []
+            lista_horario = []
             for producto in productos_pagina:
                 imagen_base64 = None
-
                 if producto.imagenp:
                     try:
                         byteImg = base64.b64decode(producto.imagenp)
                         imagen_base64 = base64.b64encode(byteImg).decode('utf-8')
                     except Exception as img_error:
                         print(f"Error al procesar imagen: {str(img_error)}")
-
+                horariosz = HorarioProducto.objects.filter(id_producto=producto.id_producto)
+                for horarioss in horariosz:
+                    datos_horario = {
+                        'id_horarioproducto': horarioss.id_horarioproducto,
+                        'id_horarios': horarioss.id_horarios.id_horarios,  # Cambiado para obtener el campo deseado
+                        'id_sucursal': horarioss.id_sucursal.id_sucursal,
+                    }
+                    lista_horario.append(datos_horario)
                 datos_producto = {
                     'id_producto': producto.id_producto,
                     'id_categoria': producto.id_categoria.id_categoria,
                     'id_um': producto.id_um.idum,
-                    'imagenp': imagen_base64,
                     'puntosp': producto.puntosp,
                     'codprincipal': producto.codprincipal,
                     'nombreproducto': producto.nombreproducto,
@@ -428,8 +586,11 @@ class ListarProductos(View):
                     'preciounitario': str(producto.preciounitario),
                     'iva': producto.iva,
                     'ice': producto.ice,
-                    'irbpnr': producto.irbpnr
+                    'irbpnr': producto.irbpnr,
+                    'horarios': lista_horario,
+                    'imagenp': imagen_base64,
                 }
+                lista_horario = []
 
                 lista_productos.append(datos_producto)
 

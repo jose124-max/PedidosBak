@@ -48,7 +48,8 @@ class CrearUsuarioView(View):
                     nombre=data.get('nombre'),
                     apellido=data.get('apellido'),
                     telefono=data.get('telefono'),
-                    id_cuenta=cuenta_nueva
+                    id_cuenta=cuenta_nueva,
+                    sestado=1
                 )
             elif tipo_empleado == 'M':
                 empleado_nuevo = Mesero.objects.create(
@@ -57,7 +58,8 @@ class CrearUsuarioView(View):
                     telefono=data.get('telefono'),
                     apellido=data.get('apellido'),
                     nombre=data.get('nombre'),
-                    id_cuenta=cuenta_nueva
+                    id_cuenta=cuenta_nueva,
+                    sestado=1
                 )
             elif tipo_empleado == 'D':
                 empleado_nuevo = Motorizado.objects.create(
@@ -66,7 +68,8 @@ class CrearUsuarioView(View):
                     nombre=data.get('nombre'),
                     apellido=data.get('apellido'),
                     telefono=data.get('telefono'),
-                    id_cuenta=cuenta_nueva
+                    id_cuenta=cuenta_nueva,
+                    sestado=1
                 )
             else:
                 # Si el tipo de empleado no es reconocido, puedes manejarlo según tus necesidades

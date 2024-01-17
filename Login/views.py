@@ -77,7 +77,6 @@ class IniciarSesionView(View):
         'id_cuenta': cuenta.id_cuenta,
         'nombreusuario': cuenta.nombreusuario,
         'rol': cuenta.rol,
-        # Agrega otros campos según sea necesario
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         return token

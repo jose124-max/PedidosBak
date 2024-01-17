@@ -6,6 +6,7 @@ class Ubicaciones(models.Model):
     latitud = models.DecimalField(max_digits=9, decimal_places=6)
     longitud = models.DecimalField(max_digits=9, decimal_places=6)
     udescripcion = models.CharField(max_length=500, blank=True, null=True)
+    sestado = models.CharField(max_length=1)
 
     class Meta:
         managed = False

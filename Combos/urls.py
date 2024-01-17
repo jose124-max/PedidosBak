@@ -9,6 +9,4 @@ urlpatterns = [
     path('comboExist/', ComboExist.as_view(), name='ComboExist'),
     path('listcategoria/', CategoriasCombosListView.as_view(), name='CategoriasCombosListView'),
     path('ver_combos/', VerCombos.as_view(), name='VerCombos'),
-    path('crearcategoriacombos/', CrearCategoriaCombos.as_view(), name='crearcategoriacombos'),
-    path('editarcategoriacombo/<int:categoria_combo_id>/', EditarCategoriaCombo.as_view(), name='editarcategoriacombo')
 ]

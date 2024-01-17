@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'Mesa',
     'avisos',
     'Empleados',
+    'Proveedores',
+    'Recompensas',
     'corsheaders', 
     'rest_framework', 
     'rest_framework_simplejwt.token_blacklist' 

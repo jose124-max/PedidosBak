@@ -22,7 +22,7 @@ class CrearCategoriaCombo(View):
             #if cuenta.rol != 'S':
             #    return JsonResponse({'error': 'No tienes permisos para crear una categoría de combo'}, status=403)
         
-            cat_nombre = request.POST.get('cat_nombre')
+            cat_nombre = request.POST.get('catnombre')
             descripcion = request.POST.get('descripcion')
             imagencategoria = request.FILES.get('imagencategoria')
             image_64_encode=None
@@ -33,81 +33,14 @@ class CrearCategoriaCombo(View):
                     image_encoded = image_64_encode.decode('utf-8')
                 except UnidentifiedImageError as img_error:
                     return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
-            categoria = CategoriasCombos(
+            categoria = CategoriasCombos(   
                 catnombre=cat_nombre,
                 descripcion=descripcion,
-                imagencategoria=image_64_encode
+                imagencategoria=image_64_encode,
+                sestado = 1
             )
             categoria.save()
             return JsonResponse({'mensaje': 'Categoría de combo creada con éxito'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-@method_decorator(csrf_exempt, name='dispatch')
-class CrearCategoriaCombos(View):
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        try:
-            catnombre = request.POST.get('catnombre')
-            descripcion = request.POST.get('descripcion')
-            imagencategoria = request.FILES.get('imagencategoria')
-
-            print(f'catnombre: {catnombre}')
-            print(f'descripcion: {descripcion}')
-            print(f'imagencategoria: {imagencategoria}')
-
-            if catnombre is None:
-                return JsonResponse({'error': 'El campo catnombre es obligatorio.'}, status=400)
-
-            image_64_encode=None
-            if imagencategoria:
-                try:
-                    image_read = imagencategoria.read()
-                    image_64_encode = base64.b64encode(image_read)
-                    image_encoded = image_64_encode.decode('utf-8')
-                except UnidentifiedImageError as img_error:
-                    return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
-                
-            categoria = CategoriasCombos(
-                catnombre=catnombre,
-                descripcion=descripcion,
-                imagencategoria=image_64_encode
-            )
-                
-            categoria.save()
-
-            return JsonResponse({'mensaje': 'Categoría de combo creada con éxito'})
-        
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)@method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(csrf_exempt, name='dispatch')
-class EditarCategoriaCombo(View):
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        try:
-            categoria_combo_id = kwargs.get('categoria_combo_id')
-            categoria_combo = CategoriasCombos.objects.get(id_catcombo=categoria_combo_id)
-            
-            catnombre = request.POST.get('catnombre', categoria_combo.catnombre)  # Si no se proporciona, se mantiene el valor existente
-            descripcion = request.POST.get('descripcion')
-            imagencategoria = request.FILES.get('imagencategoria')
-
-            categoria_combo.catnombre = catnombre
-            categoria_combo.descripcion = descripcion
-
-            if imagencategoria:
-                try:
-                    image_read = imagencategoria.read()
-                    image_64_encode = base64.b64encode(image_read)
-                    image_encoded = image_64_encode.decode('utf-8')
-                    categoria_combo.imagencategoria = image_64_encode
-                except UnidentifiedImageError as img_error:
-                    return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
-
-            categoria_combo.save()
-            
-            return JsonResponse({'mensaje': 'Categoría de combo editada con éxito'})
-        except CategoriasCombos.DoesNotExist:
-            return JsonResponse({'error': 'Categoría de combo no encontrada'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 @method_decorator(csrf_exempt, name='dispatch')
@@ -175,7 +108,9 @@ class CrearCombo(View):
                 preciounitario=preciounitario,
                 iva='0', 
                 ice='0',
-                irbpnr='0'  
+                irbpnr='0',
+                sestado = 1
+
             )
             combo.save()
 
