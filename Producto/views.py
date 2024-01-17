@@ -81,7 +81,7 @@ class CrearCategoria(View):
             cat_nombre = request.POST.get('catnombre')
             descripcion = request.POST.get('descripcion')
 
-            imagen_archivo = request.FILES.get('imagencategoria')
+            imagen_archivo = request.FILES.get('imagencategoria')  # Cambiado a request.FILES
             image_64_encode=None
             if imagen_archivo:
                 try:
@@ -147,6 +147,7 @@ class ListaTiposYCategorias(View):
             return JsonResponse({'error': str(e)}, status=500)
 
     def convertir_imagen_a_base64(self, imagen):
+        # Convierte la imagen a base64 y devuelve la cadena resultante
         return base64.b64encode(imagen).decode('utf-8') if imagen else None
 @method_decorator(csrf_exempt, name='dispatch')
 class ListaTiposProductos(View):
@@ -230,7 +231,7 @@ class EditarCategoria(View):
             #cuenta = Cuenta.objects.get(nombreusuario=request.user.username)
             #if cuenta.rol != 'S':
                 #return JsonResponse({'error': 'No tienes permisos para crear editar una categoría'}, status=403)
-            categoria_id = kwargs.get('categoria_id')
+            categoria_id = kwargs.get('categoria_id')  # Asegúrate de tener la URL configurada para recibir el ID de la categoría
             categoria = Categorias.objects.get(id_categoria=categoria_id)
             imagencategoria = request.FILES.get('imagencategoria')
             nombre= request.POST.get('catnombre')
@@ -324,6 +325,7 @@ class CrearProducto(View):
                 except UnidentifiedImageError as img_error:
                     return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
 
+            # Crear el producto
             categoria = Categorias.objects.get(id_categoria=id_categoria)
             unidad_medida = UnidadMedida.objects.get(idum=id_um)
 
@@ -384,6 +386,7 @@ class EditarProducto(View):
             producto.ice = request.POST.get('ice', producto.ice)
             producto.irbpnr = request.POST.get('irbpnr', producto.irbpnr)
 
+            # Manejo de la imagen
             imagen_producto = request.FILES.get('imagenp')
             if imagen_producto:
                 try:
@@ -400,16 +403,11 @@ class EditarProducto(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
         
-<<<<<<< HEAD
-=======
-
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearComponente(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
-<<<<<<< HEAD
             nombre = request.POST.get('nombre')
             descripcion = request.POST.get('descripcion')
             costo = request.POST.get('costo')
@@ -461,34 +459,12 @@ class CrearComponente(View):
 
             return JsonResponse({'mensaje': 'Componente creado con éxito'})
 
-=======
-            data = json.loads(request.body)
-
-            nombre = data.get('nombre')
-            descripcion = data.get('descripcion')
-            costo = data.get('costo')
-            tipo = data.get('tipo')
-            id_um = data.get('id_um')
-
-            unidad_medida = UnidadMedida.objects.get(idum=id_um)
-
-            componente = Componente.objects.create(
-                nombre=nombre,
-                descripcion=descripcion,
-                costo=costo,
-                tipo=tipo,
-                id_um=unidad_medida
-            )
-
-            return JsonResponse({'mensaje': 'Componente creado con éxito', 'id_componente': componente.id_componente})
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
 class ListarComponentes(View):
     def get(self, request, *args, **kwargs):
         try:
-<<<<<<< HEAD
             # Obtener todos los componentes
             componentes = Componente.objects.all()
 
@@ -501,40 +477,23 @@ class ListarComponentes(View):
                     'id_categoria': componente.id_categoria.id_categoria,
                     'catnombre': componente.id_categoria.catnombre,
                 }
-=======
-            componentes = Componente.objects.all()
-
-            lista_componentes = []
-            for componente in componentes:
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
                 componente_data = {
                     'id_componente': componente.id_componente,
                     'nombre': componente.nombre,
                     'descripcion': componente.descripcion,
-<<<<<<< HEAD
                     'costo': '$'+str(componente.costo).replace('€', ''),
                     'tipo': componente.tipo,
                     'id_um': componente.id_um.idum,
                     'id_categoria': tipo_producto_data,
-=======
-                    'costo': str(componente.costo),
-                    'tipo': componente.tipo,
-                    'id_um': componente.id_um.idum,
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
                     'nombre_um': componente.id_um.nombreum,
                 }
 
                 lista_componentes.append(componente_data)
 
-<<<<<<< HEAD
             # Devolver la lista de componentes en formato JSON
             return JsonResponse({'componentes': lista_componentes})
         except Exception as e:
             # Manejar errores aquí
-=======
-            return JsonResponse({'componentes': lista_componentes})
-        except Exception as e:
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             return JsonResponse({'error': str(e)}, status=500)
         
 
@@ -543,7 +502,6 @@ class EditarComponente(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
-<<<<<<< HEAD
             # Obtener el ID del componente a editar de los argumentos de la URL
             id_componente = kwargs.get('id_componente')
 
@@ -554,31 +512,17 @@ class EditarComponente(View):
             data = json.loads(request.body)
 
             # Actualizar los datos del componente
-=======
-            id_componente = kwargs.get('id_componente')
-
-            componente = Componente.objects.get(id_componente=id_componente)
-
-            data = json.loads(request.body)
-
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             componente.nombre = data.get('nombre', componente.nombre)
             componente.descripcion = data.get('descripcion', componente.descripcion)
             componente.costo = data.get('costo', componente.costo)
             componente.tipo = data.get('tipo', componente.tipo)
 
-<<<<<<< HEAD
             # Verificar que la unidad de medida exista
-=======
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             id_um = data.get('id_um')
             unidad_medida = UnidadMedida.objects.get(idum=id_um)
             componente.id_um = unidad_medida
 
-<<<<<<< HEAD
             # Guardar los cambios
-=======
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             componente.save()
 
             return JsonResponse({'mensaje': 'Componente editado con éxito', 'id_componente': componente.id_componente})
@@ -590,26 +534,29 @@ class EditarComponente(View):
             return JsonResponse({'error': str(e)}, status=400)
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
 class ListarProductos(View):
     def get(self, request, *args, **kwargs):
         try:
+            # Parámetros de paginación y búsqueda
             page = int(request.GET.get('page', 1))
             size = int(request.GET.get('size', 8))
             search = request.GET.get('search', '')
 
+            # Filtrar productos por término de búsqueda
             productos = Producto.objects.filter(nombreproducto__icontains=search)
 
+            # Configurar la paginación
             paginator = Paginator(productos, size)
 
             try:
+                # Obtener la página actual
                 productos_pagina = paginator.page(page)
             except EmptyPage:
+                # Si la página está fuera de rango, devolver una lista vacía
                 productos_pagina = []
 
+            # Convertir productos a formato JSON
             lista_productos = []
             lista_horario = []
             for producto in productos_pagina:
@@ -647,18 +594,23 @@ class ListarProductos(View):
 
                 lista_productos.append(datos_producto)
 
+            # Devolver la lista de productos paginada en formato JSON
             return JsonResponse({'productos': lista_productos, 'total': paginator.count}, safe=False)
 
         except Exception as e:
+            # Manejar errores aquí
             return JsonResponse({'error': str(e)}, status=500)
 def obtener_siguiente_codprincipal():
     max_cod_producto = Producto.objects.aggregate(max_cod=Max(ExpressionWrapper(F('codprincipal'), output_field=IntegerField())))
 
+    # Obtener el CodPrincipal más alto de Combo
     max_cod_combo = Combo.objects.aggregate(max_cod=Max(ExpressionWrapper(F('codprincipal'), output_field=IntegerField())))
 
+    # Obtener el máximo entre los dos y calcular el siguiente número
     ultimo_numero = max(int(max_cod_producto['max_cod'] or 0), int(max_cod_combo['max_cod'] or 0))
     siguiente_numero = ultimo_numero + 1
 
+    # Formatear el siguiente número como CodPrincipal
     siguiente_codprincipal = f'{siguiente_numero:025d}'
 
     return siguiente_codprincipal

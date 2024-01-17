@@ -44,77 +44,6 @@ class CrearCategoriaCombo(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 @method_decorator(csrf_exempt, name='dispatch')
-<<<<<<< HEAD
-=======
-class CrearCategoriaCombos(View):
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        try:
-            catnombre = request.POST.get('catnombre')
-            descripcion = request.POST.get('descripcion')
-            imagencategoria = request.FILES.get('imagencategoria')
-
-            print(f'catnombre: {catnombre}')
-            print(f'descripcion: {descripcion}')
-            print(f'imagencategoria: {imagencategoria}')
-
-            if catnombre is None:
-                return JsonResponse({'error': 'El campo catnombre es obligatorio.'}, status=400)
-
-            image_64_encode=None
-            if imagencategoria:
-                try:
-                    image_read = imagencategoria.read()
-                    image_64_encode = base64.b64encode(image_read)
-                    image_encoded = image_64_encode.decode('utf-8')
-                except UnidentifiedImageError as img_error:
-                    return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
-                
-            categoria = CategoriasCombos(
-                catnombre=catnombre,
-                descripcion=descripcion,
-                imagencategoria=image_64_encode
-            )
-                
-            categoria.save()
-
-            return JsonResponse({'mensaje': 'Categoría de combo creada con éxito'})
-        
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)@method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(csrf_exempt, name='dispatch')
-class EditarCategoriaCombo(View):
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        try:
-            categoria_combo_id = kwargs.get('categoria_combo_id')
-            categoria_combo = CategoriasCombos.objects.get(id_catcombo=categoria_combo_id)
-            
-            catnombre = request.POST.get('catnombre', categoria_combo.catnombre)
-            descripcion = request.POST.get('descripcion')
-            imagencategoria = request.FILES.get('imagencategoria')
-
-            categoria_combo.catnombre = catnombre
-            categoria_combo.descripcion = descripcion
-
-            if imagencategoria:
-                try:
-                    image_read = imagencategoria.read()
-                    image_64_encode = base64.b64encode(image_read)
-                    image_encoded = image_64_encode.decode('utf-8')
-                    categoria_combo.imagencategoria = image_64_encode
-                except UnidentifiedImageError as img_error:
-                    return JsonResponse({'error': f"Error al procesar imagen: {str(img_error)}"}, status=400)
-
-            categoria_combo.save()
-            
-            return JsonResponse({'mensaje': 'Categoría de combo editada con éxito'})
-        except CategoriasCombos.DoesNotExist:
-            return JsonResponse({'error': 'Categoría de combo no encontrada'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-@method_decorator(csrf_exempt, name='dispatch')
->>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
 class categoriaComboExist(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -185,13 +114,16 @@ class CrearCombo(View):
             )
             combo.save()
 
+            # Procesa los detalles del combo
             detalle_combo_data = json.loads(request.POST.get('detalle_combo', '[]'))
             
+            # Procesa los detalles del combo
             for detalle_data in detalle_combo_data:
                 id_producto = detalle_data.get('id_producto')
                 cantidad = detalle_data.get('cantidad')
                 producto = Producto.objects.get(id_producto=id_producto)
 
+                # Crea y guarda el detalle del combo
                 DetalleCombo.objects.create(
                     id_combo=combo,
                     id_producto=producto,
@@ -216,7 +148,7 @@ class EditarCombo(View):
             if cuenta.rol != 'S':
                 return JsonResponse({'error': 'No tienes permisos para editar un combo'}, status=403)
 
-            combo_id = kwargs.get('combo_id')
+            combo_id = kwargs.get('combo_id')  # Asegúrate de tener la URL configurada para recibir el ID del combo
             combo = Combo.objects.get(id_combo=combo_id)
             combo.id_catcombo = CategoriasCombos.objects.get(id_catcombo=request.POST.get('id_catcombo', combo.id_catcombo.id_catcombo))
             combo.imagenc = request.POST.get('imagenc', combo.imagenc)
