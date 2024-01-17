@@ -46,6 +46,7 @@ class CrearUsuarioView(View):
                 correorecuperacion =correorecuperacion
             )
 
+            # Crear un nuevo cliente asociado al usuario y la cuenta
             cliente_nuevo  = Clientes.objects.create(
                 ctelefono=ctelefono,
                 id_cuenta=cuenta_nueva,
@@ -117,8 +118,10 @@ class VerificarRolView(View):
             if not token:
                 return JsonResponse({'error': 'Token no proporcionado'}, status=400)
 
+            # Decodificar el token para obtener la información del usuario
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 
+            # Extraer el rol del payload
             rol = payload.get('rol')
 
             if rol:
@@ -170,10 +173,13 @@ class VerificarRolView(View):
         }
         return JsonResponse({'mensaje': 'Inicio de sesión exitoso como Administrador','administrador_info':administrador_info})
     def handle_jefecocina(self, cuenta):
+        # Realiza acciones específicas para el rol de Administrador
         return JsonResponse({'mensaje': 'Inicio de sesión exitoso como Administrador'})
     def handle_mesero(self, cuenta):
+        # Realiza acciones específicas para el rol de Administrador
         return JsonResponse({'mensaje': 'Inicio de sesión exitoso como Administrador'})
     def handle_motorizado(self, cuenta):
+        # Realiza acciones específicas para el rol de Administrador
         return JsonResponse({'mensaje': 'Inicio de sesión exitoso como Administrador'})
     def handle_default(self, cuenta):
         return JsonResponse({'mensaje': 'Rol no reconocido'}, status=400)
@@ -184,10 +190,12 @@ class CerrarSesionView(View):
             usuario = User.objects.get(username='nombre_de_usuario')
             token = Token.objects.get(user=usuario)
 
+    # Elimina el token
             token.delete()
                         
             return JsonResponse({'mensaje': 'Sesión cerrada con éxito'})
         except Token.DoesNotExist:
+    # Maneja el caso en el que el token no existe
             print("El token no existe para este usuario.")          
 @method_decorator(login_required, name='dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
@@ -196,10 +204,13 @@ class EditarCliente(View):
     def post(self, request, *args, **kwargs):
         try:
             cuenta = Cuenta.objects.filter(nombreusuario=request.user.username).first()
-            cliente_id = Clientes.objects.filter(id_cuenta=cuenta.id_cuenta).first().id_cliente
+            # Obtener datos del cliente a actualizar
+            cliente_id = Clientes.objects.filter(id_cuenta=cuenta.id_cuenta).first().id_cliente  # Asegúrate de tener la URL configurada para recibir el ID del cliente
 
+            # Obtener cliente existente
             cliente = Clientes.objects.get(id_cliente=cliente_id)
 
+            # Actualizar solo los campos permitidos
             cliente.crazon_social = request.POST.get('crazon_social', cliente.crazon_social)
             cliente.ctelefono = request.POST.get('ctelefono', cliente.ctelefono)
             cliente.tipocliente = request.POST.get('tipocliente', cliente.tipocliente)
@@ -209,6 +220,7 @@ class EditarCliente(View):
             cliente.ccorreo_electronico = request.POST.get('ccorreo_electronico', cliente.ccorreo_electronico)
             cliente.ubicacion = request.POST.get('ubicacion', cliente.ubicacion)
 
+            # Guardar el cliente actualizado
             cliente.save()
 
             return JsonResponse({'mensaje': 'Cliente editado con éxito'})
