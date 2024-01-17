@@ -15,7 +15,6 @@ class CrearHorarioSucursal(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
-            # Obtener datos del cuerpo de la solicitud
             nombreh = request.POST.get('nombreh', '')
             hordescripcion = request.POST.get('hordescripcion', '')
             idsucursal = request.POST.get('idsucursal', '')

@@ -17,7 +17,7 @@ from io import BytesIO
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from Empleados.models import *
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 class SucursalesListView(View):
     def get(self, request, *args, **kwargs):

@@ -65,7 +65,6 @@ class EditarMesa(View):
             activa = request.POST.get('activa')
             max_personas = request.POST.get('max_personas')
 
-            # Validar valores de estado y activa
             if estado not in ['D', 'R', 'U', 'A']:
                 return JsonResponse({'error': 'Valor no válido para estado'}, status=400)
 

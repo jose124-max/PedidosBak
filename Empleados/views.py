@@ -40,7 +40,6 @@ class CrearUsuarioView(View):
                 correorecuperacion=correo
             )
 
-            # Crear un nuevo empleado según el tipo especificado
             if tipo_empleado == 'X':
                 empleado_nuevo = JefeCocina.objects.create(
                     id_sucursal=Sucursales.objects.get(id_sucursal=data.get('id_sucursal')),
@@ -72,7 +71,6 @@ class CrearUsuarioView(View):
                     sestado=1
                 )
             else:
-                # Si el tipo de empleado no es reconocido, puedes manejarlo según tus necesidades
                 raise ValueError('Tipo de empleado no válido')
 
             return JsonResponse({'mensaje': 'Usuario y empleado creado con éxito'})
@@ -108,7 +106,6 @@ class EditarEmpleadoView(View):
 
     def post(self, request, tipo_empleado, empleado_id, *args, **kwargs):
         try:
-            # Obtener el empleado según el tipo
             if tipo_empleado == 'X':
                 empleado = get_object_or_404(JefeCocina, id_jefecocina=empleado_id)
             elif tipo_empleado == 'D':
@@ -116,10 +113,7 @@ class EditarEmpleadoView(View):
             elif tipo_empleado == 'M':
                 empleado = get_object_or_404(Mesero, id_mesero=empleado_id)
             else:
-                # Manejar el tipo de empleado no reconocido según tus necesidades
                 return JsonResponse({'error': 'Tipo de empleado no válido'}, status=400)
-
-            # Actualizar los datos del empleado según la entrada del formulario
             data = json.loads(request.body)
             empleado.nombre = data.get('nombre')
             empleado.apellido = data.get('apellido')

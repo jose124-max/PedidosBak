@@ -6,3 +6,4 @@ urlpatterns = [
     path('listar/', ListarBodegasView.as_view(), name='listar_bodegas'),
     path('editar/<int:bodega_id>/', EditarBodegaView.as_view(), name='editar_bodega')
 ]
+

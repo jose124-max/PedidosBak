@@ -51,16 +51,23 @@ class UnidadMedida(models.Model):
 class Componente(models.Model):
     id_componente = models.AutoField(primary_key=True, db_column='id_componente')
     nombre = models.CharField(max_length=255)
+<<<<<<< HEAD
     id_categoria = models.ForeignKey('Categorias', on_delete=models.CASCADE, db_column='id_categoria')
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
     descripcion = models.TextField()
     costo = models.DecimalField(max_digits=10, decimal_places=2)
     tipo = models.CharField(max_length=100)
     id_um = models.ForeignKey(UnidadMedida, on_delete=models.CASCADE, db_column='id_um')
+<<<<<<< HEAD
     sestado = models.CharField(max_length=1)
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
 
     class Meta:
         managed = False
         db_table = 'componente'
+<<<<<<< HEAD
 
 class EnsambleComponente(models.Model):
     id_ensamblec = models.AutoField(primary_key=True)
@@ -91,3 +98,5 @@ class HorarioProducto(models.Model):
     class Meta:
         managed = False
         db_table = 'horarioproducto'
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914

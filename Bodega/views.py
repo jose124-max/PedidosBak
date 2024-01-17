@@ -12,7 +12,11 @@ import json
 # Create your views here.
 @method_decorator(csrf_exempt, name='dispatch')
 class CrearBodegaView(View):
+<<<<<<< HEAD
     #@method_decorator(login_required)
+=======
+    #@method_decorator(login_required)  # Aplica el decorador login_required
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         try:
@@ -44,7 +48,10 @@ class ListarBodegasView(View):
             
             for bodega in bodegas:
                 bodegas_list.append({
+<<<<<<< HEAD
                     'id_bodega': bodega.id_bodega,
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
                     'nombrebog': bodega.nombrebog,
                     'descripcion': bodega.descripcion,
                     'id_sucursal': bodega.id_sucursal.id_sucursal,
@@ -66,13 +73,19 @@ class EditarBodegaView(View):
             descripcion = data.get('descripcion')
             id_sucursal = data.get('id_sucursal')
 
+<<<<<<< HEAD
             # Reemplaza 'id' con el nombre correcto del campo de identificación en tu modelo Bodegas
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             bodega = Bodegas.objects.get(id_bodega=bodega_id)
 
             bodega.nombrebog = nombrebog
             bodega.descripcion = descripcion
 
+<<<<<<< HEAD
             # Obtener la sucursal correspondiente
+=======
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
             sucursal = Sucursales.objects.get(id_sucursal=id_sucursal)
             bodega.id_sucursal = sucursal
 
@@ -85,4 +98,9 @@ class EditarBodegaView(View):
         except Sucursales.DoesNotExist:
             return JsonResponse({'error': 'La sucursal no existe'}, status=400)
         except Exception as e:
+<<<<<<< HEAD
             return JsonResponse({'error': str(e)}, status=400)
+=======
+            return JsonResponse({'error': str(e)}, status=400)
+
+>>>>>>> a713a27e1e933ca1072f92d5c4eb79c6ee7cb914
